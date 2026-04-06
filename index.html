@@ -12,7 +12,7 @@
     body {
       background: #f7f6f2;
       color: #1a1a1a;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       padding: 52px 60px;
       min-height: 100vh;
     }
@@ -36,16 +36,15 @@
     .subtitle em { font-style: italic; color: #444; }
     .subtitle .hl { color: #1d4ed8; font-weight: 500; }
 
-    /* ── Controls row ── */
+    /* ── Controls ── */
     .controls {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      margin: 28px 0 18px;
+      margin: 28px 0 16px;
     }
-
     .filters { display: flex; flex-wrap: wrap; gap: 8px; }
 
     .filter-btn {
@@ -53,30 +52,34 @@
       border-radius: 9999px;
       border: 1.5px solid #d4d4d4;
       background: #fff;
-      color: #666;
+      color: #555;
       font-size: 0.83rem;
       font-family: inherit;
-      letter-spacing: 0.01em;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.22s ease;
       outline: none;
       user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 7px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
     .filter-btn:hover { border-color: #999; color: #222; background: #fafafa; }
-    .filter-btn.active {
-      background: #1d4ed8;
-      border-color: #1d4ed8;
-      color: #fff;
-      font-weight: 500;
-      box-shadow: 0 2px 8px rgba(29,78,216,0.3);
-    }
+    .filter-btn .btn-icon { font-size: 11px; opacity: 0.7; }
 
-    /* ── Rotate toggle ── */
+    /* Per-class active colours */
+    .filter-btn.active                        { color: #fff; font-weight: 600; border-color: transparent; box-shadow: 0 2px 10px rgba(0,0,0,0.18); }
+    .filter-btn.active[data-filter="all"]     { background: #374151; }
+    .filter-btn.active[data-filter="fx"]      { background: #1d4ed8; }
+    .filter-btn.active[data-filter="eq"]      { background: #15803d; }
+    .filter-btn.active[data-filter="bd"]      { background: #7e22ce; }
+    .filter-btn.active[data-filter="cm"]      { background: #b45309; }
+    .filter-btn.active[data-filter="cr"]      { background: #0e7490; }
+    .filter-btn.active .btn-icon              { opacity: 1; }
+
+    /* ── Rotate btn ── */
     .rotate-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
       padding: 7px 16px;
       border-radius: 9999px;
       border: 1.5px solid #d4d4d4;
@@ -85,54 +88,64 @@
       font-size: 0.82rem;
       font-family: inherit;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
       outline: none;
-      user-select: none;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
       white-space: nowrap;
     }
-    .rotate-btn:hover { border-color: #999; color: #222; }
-    .rotate-btn.spinning {
-      border-color: #1d4ed8;
-      color: #1d4ed8;
-      background: #eff4ff;
-    }
-    .rotate-icon {
-      font-size: 13px;
-      transition: transform 0.3s ease;
-      display: inline-block;
-    }
-    .rotate-btn.spinning .rotate-icon {
-      animation: spin-icon 2s linear infinite;
-    }
-    @keyframes spin-icon {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
+    .rotate-btn:hover { border-color: #999; color: #333; }
+    .rotate-btn.spinning { border-color: #374151; color: #374151; background: #f4f4f5; }
+    .rotate-icon { display: inline-block; font-size: 14px; }
+    .rotate-btn.spinning .rotate-icon { animation: spin 2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Legend ── */
-    .legend {
+    .legend-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
-      margin-bottom: 14px;
+      gap: 18px;
+      margin-bottom: 10px;
       align-items: center;
     }
     .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
       font-size: 0.78rem;
       color: #bbb;
-      transition: color 0.4s;
+      transition: color 0.35s;
+      cursor: default;
     }
     .legend-item.lit { color: #333; }
-    .legend-swatch {
-      width: 22px;
-      height: 3px;
-      border-radius: 2px;
-      transition: opacity 0.4s;
+    .legend-icon-wrap {
+      width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
     }
+    .legend-icon-wrap svg { overflow: visible; }
+
+    /* ── Active class descriptor banner ── */
+    #descriptor {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 18px;
+      border-radius: 10px;
+      border: 1.5px solid #e0e0e0;
+      background: #fff;
+      margin-bottom: 14px;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      pointer-events: none;
+    }
+    #descriptor.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #descriptor .desc-icon {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    #descriptor .desc-icon svg { overflow: visible; }
+    #descriptor .desc-name { font-size: 0.88rem; font-weight: 700; color: #111; }
+    #descriptor .desc-text { font-size: 0.78rem; color: #777; margin-top: 2px; line-height: 1.5; }
 
     /* ── Map ── */
     #map-wrap {
@@ -140,14 +153,13 @@
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid #e0ddd6;
-      background: #eef2f7;
+      background: #edf2f8;
       box-shadow: 0 4px 24px rgba(0,0,0,0.07);
     }
     #map { width: 100%; display: block; }
 
-    /* ── SVG geo ── */
     .sphere  { fill: #d6e4f0; }
-    .grat    { fill: none; stroke: #c4d8eb; stroke-width: 0.4; }
+    .grat    { fill: none; stroke: #c2d5e8; stroke-width: 0.4; }
     .land    { fill: #dcdad4; }
     .borders { fill: none; stroke: #c8c5bf; stroke-width: 0.4; }
 
@@ -169,26 +181,21 @@
       border-radius: 10px;
       padding: 14px 16px;
       pointer-events: none;
-      font-size: 0.8rem;
-      min-width: 200px;
+      min-width: 210px;
       opacity: 0;
       transition: opacity 0.12s;
       z-index: 10;
       box-shadow: 0 8px 28px rgba(0,0,0,0.12);
     }
     #tip.show { opacity: 1; }
-    .tip-city {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #111;
-      margin-bottom: 10px;
-      padding-bottom: 9px;
-      border-bottom: 1px solid #eee;
-    }
-    .tip-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
-    .tip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .tip-lbl { color: #888; flex: 1; font-size: 0.77rem; }
-    .tip-val { font-weight: 600; color: #222; font-size: 0.82rem; }
+    .tip-city { font-size: 0.93rem; font-weight: 700; color: #111; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+    .tip-row  { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 0.8rem; }
+    .tip-shape { width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .tip-shape svg { overflow: visible; }
+    .tip-lbl  { color: #888; flex: 1; font-size: 0.77rem; }
+    .tip-val  { font-weight: 600; color: #222; font-size: 0.81rem; }
+    .tip-highlight .tip-lbl { color: #333; font-weight: 500; }
+    .tip-highlight .tip-val { font-size: 0.85rem; }
 
     /* ── Stats ── */
     .stats {
@@ -206,60 +213,58 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
     .stat-card.lit {
-      border-color: #1d4ed8;
-      background: #eff4ff;
-      box-shadow: 0 2px 12px rgba(29,78,216,0.12);
+      border-color: var(--ac-color, #1d4ed8);
+      background: var(--ac-bg, #eff4ff);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
     }
-    .stat-val {
-      font-size: 1.65rem;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      line-height: 1;
-      margin-bottom: 8px;
-      color: #111;
-    }
-    .stat-lbl {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #999;
-      font-weight: 500;
-    }
+    .stat-val { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1; margin-bottom: 8px; color: #111; }
+    .stat-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #999; font-weight: 500; }
   </style>
 </head>
 <body>
 
   <div style="text-align:right;margin-bottom:16px">
-    <a href="exchanges.html" style="font-size:0.8rem;color:#1d4ed8;text-decoration:none;border:1px solid #1d4ed8;border-radius:9999px;padding:5px 14px;transition:all 0.2s" onmouseover="this.style.background='#1d4ed8';this.style.color='#fff'" onmouseout="this.style.background='';this.style.color='#1d4ed8'">Top 25 Stock Exchanges →</a>
+    <a href="exchanges.html" style="font-size:0.8rem;color:#1d4ed8;text-decoration:none;border:1px solid #c3d3f5;border-radius:9999px;padding:5px 14px;background:#eff4ff;transition:all 0.2s"
+      onmouseover="this.style.background='#1d4ed8';this.style.color='#fff'"
+      onmouseout="this.style.background='#eff4ff';this.style.color='#1d4ed8'">
+      Top 25 Stock Exchanges →
+    </a>
   </div>
-  <h1>Where does trading happen?</h1>
 
+  <h1>Where does trading happen?</h1>
   <p class="subtitle">
     Before we look at <em>when</em> markets are liquid, it helps to understand
     <em>where</em> they are and <em>how big</em> they are. Financial markets are
     spread across the globe — and they vary enormously in scale.
   </p>
   <p class="subtitle" style="margin-top:7px">
-    Each set of rings represents a major financial center.
-    Size shows <span class="hl">daily trading volume</span>.
-    Pick an asset class to see where it's traded.
+    Each marker represents a major financial center. Size reflects
+    <span class="hl">daily trading volume</span>. Each asset class has
+    its own icon — click one to see it on the map.
   </p>
 
   <div class="controls">
     <div class="filters" id="filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="fx">Foreign Exchange</button>
-      <button class="filter-btn" data-filter="eq">Equities</button>
-      <button class="filter-btn" data-filter="bd">Bonds</button>
-      <button class="filter-btn" data-filter="cm">Commodities</button>
-      <button class="filter-btn" data-filter="cr">Crypto</button>
+      <button class="filter-btn active" data-filter="all"><span class="btn-icon">⬤</span> All</button>
+      <button class="filter-btn" data-filter="fx" ><span class="btn-icon">◆</span> Foreign Exchange</button>
+      <button class="filter-btn" data-filter="eq" ><span class="btn-icon">▲</span> Equities</button>
+      <button class="filter-btn" data-filter="bd" ><span class="btn-icon">■</span> Bonds</button>
+      <button class="filter-btn" data-filter="cm" ><span class="btn-icon">✦</span> Commodities</button>
+      <button class="filter-btn" data-filter="cr" ><span class="btn-icon">★</span> Crypto</button>
     </div>
     <button class="rotate-btn" id="rotateBtn">
       <span class="rotate-icon">↻</span> Rotate map
     </button>
   </div>
 
-  <div class="legend" id="legend"></div>
+  <div class="legend-row" id="legend"></div>
+  <div id="descriptor">
+    <div class="desc-icon" id="descIcon"></div>
+    <div>
+      <div class="desc-name" id="descName"></div>
+      <div class="desc-text" id="descText"></div>
+    </div>
+  </div>
 
   <div id="map-wrap">
     <svg id="map"></svg>
@@ -271,7 +276,45 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
   <script>
-  // ── Data ──────────────────────────────────────────────────────────────────
+  // ── Asset class config ─────────────────────────────────────────────────────
+  const AC = [
+    {
+      id: "fx", label: "Foreign Exchange", color: "#1d4ed8",
+      bg: "#eff4ff",
+      sym: () => d3.symbolDiamond,
+      icon: "◆",
+      desc: "Currency pairs traded between banks, institutions & central banks worldwide. The world's largest market by volume.",
+    },
+    {
+      id: "eq", label: "Equities", color: "#15803d",
+      bg: "#f0fdf4",
+      sym: () => d3.symbolTriangle,
+      icon: "▲",
+      desc: "Company shares listed and traded on public stock exchanges. Represents ownership stakes in corporations.",
+    },
+    {
+      id: "bd", label: "Bonds", color: "#7e22ce",
+      bg: "#faf5ff",
+      sym: () => d3.symbolSquare,
+      icon: "■",
+      desc: "Government and corporate debt instruments. Investors lend capital in exchange for fixed interest payments.",
+    },
+    {
+      id: "cm", label: "Commodities", color: "#b45309",
+      bg: "#fffbeb",
+      sym: () => d3.symbolWye,
+      icon: "✦",
+      desc: "Physical goods — crude oil, gold, silver, wheat, natural gas. Traded on futures exchanges globally.",
+    },
+    {
+      id: "cr", label: "Crypto", color: "#0e7490",
+      bg: "#f0fdfa",
+      sym: () => d3.symbolStar,
+      icon: "★",
+      desc: "Decentralised digital assets — Bitcoin, Ethereum and tokens. Traded 24/7 on global digital exchanges.",
+    },
+  ];
+
   const CITIES = [
     { name:"London",    flag:"🇬🇧", lat: 51.507, lng:  -0.128, vol:{fx:3576,eq:320, bd:490,cm:55, cr:6 } },
     { name:"New York",  flag:"🇺🇸", lat: 40.713, lng: -74.006, vol:{fx:1264,eq:500, bd:900,cm:110,cr:12} },
@@ -286,14 +329,6 @@
     { name:"Dubai",     flag:"🇦🇪", lat: 25.205, lng:  55.271, vol:{fx:60,  eq:30,  bd:25, cm:80, cr:5 } },
   ];
 
-  const AC = [
-    { id:"fx", label:"Foreign Exchange", color:"#1d4ed8" },
-    { id:"eq", label:"Equities",         color:"#15803d" },
-    { id:"bd", label:"Bonds",            color:"#7e22ce" },
-    { id:"cm", label:"Commodities",      color:"#b45309" },
-    { id:"cr", label:"Crypto",           color:"#0e7490" },
-  ];
-
   const STATS = [
     { val:"$7.5T", lbl:"FX Daily Volume",   id:"fx" },
     { val:"$900B", lbl:"US Bonds Daily",    id:"bd" },
@@ -302,11 +337,23 @@
     { val:"$30B",  lbl:"Bitcoin Daily",     id:"cr" },
   ];
 
+  const AC_MAP = Object.fromEntries(AC.map(a => [a.id, a]));
+
+  // ── Helper: tiny symbol SVG string ────────────────────────────────────────
+  function symSvg(acId, size, color, alpha = 1) {
+    const ac = AC_MAP[acId];
+    const area = size * size * Math.PI;
+    const d = d3.symbol().type(ac.sym()).size(area)();
+    return `<svg width="${size*2+4}" height="${size*2+4}" viewBox="${-size-2} ${-size-2} ${size*2+4} ${size*2+4}">
+      <path d="${d}" fill="${color}" fill-opacity="${alpha}" stroke="${color}" stroke-width="1.5" stroke-opacity="${Math.min(1,alpha+0.1)}"/>
+    </svg>`;
+  }
+
   // ── Scales ────────────────────────────────────────────────────────────────
   const maxVol = d3.max(CITIES.flatMap(c => Object.values(c.vol)));
-  const rScale = d3.scaleSqrt().domain([0, maxVol]).range([0, 56]);
+  const rScale = d3.scaleSqrt().domain([0, maxVol]).range([0, 58]);
 
-  // ── SVG ───────────────────────────────────────────────────────────────────
+  // ── SVG setup ─────────────────────────────────────────────────────────────
   const mapWrap = document.getElementById("map-wrap");
   const W = mapWrap.clientWidth || 1100;
   const H = Math.round(W * 0.52);
@@ -315,93 +362,56 @@
     .attr("viewBox", `0 0 ${W} ${H}`)
     .attr("preserveAspectRatio", "xMidYMid meet");
 
-  // Glow filters
   const defs = svg.append("defs");
+
+  // Glow filter per asset class
   AC.forEach(ac => {
-    const f = defs.append("filter")
-      .attr("id", `glow-${ac.id}`)
-      .attr("x","-60%").attr("y","-60%")
-      .attr("width","220%").attr("height","220%");
-    f.append("feGaussianBlur").attr("in","SourceGraphic").attr("stdDeviation","4").attr("result","blur");
+    const f = defs.append("filter").attr("id", `glow-${ac.id}`)
+      .attr("x","-70%").attr("y","-70%").attr("width","240%").attr("height","240%");
+    f.append("feGaussianBlur").attr("in","SourceGraphic").attr("stdDeviation","5").attr("result","blur");
     const fm = f.append("feMerge");
     fm.append("feMergeNode").attr("in","blur");
     fm.append("feMergeNode").attr("in","SourceGraphic");
   });
 
   // ── Projection ────────────────────────────────────────────────────────────
-  let rotAngle = 0;
   const proj = d3.geoNaturalEarth1()
     .scale(W / 6.3)
-    .translate([W / 2, H / 2])
-    .rotate([rotAngle, 0]);
+    .translate([W / 2, H / 2]);
   const geo = d3.geoPath().projection(proj);
 
-  // ── Static map layers (re-rendered on rotate) ─────────────────────────────
-  const sphereEl   = svg.append("path").datum({type:"Sphere"}).attr("class","sphere").attr("d",geo);
-  const gratEl     = svg.append("path").datum(d3.geoGraticule10()).attr("class","grat").attr("d",geo);
+  // ── Static layers ─────────────────────────────────────────────────────────
+  const sphereEl  = svg.append("path").datum({type:"Sphere"}).attr("class","sphere").attr("d",geo);
+  const gratEl    = svg.append("path").datum(d3.geoGraticule10()).attr("class","grat").attr("d",geo);
   let landSel, borderSel, cityLayer;
   let pendingFilter = "all";
-  let worldData = null;
 
-  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
-    .then(world => {
-      worldData = world;
-
-      landSel = svg.append("g")
-        .selectAll("path")
-        .data(topojson.feature(world, world.objects.countries).features)
-        .join("path").attr("class","land").attr("d",geo);
-
-      borderSel = svg.append("path")
-        .datum(topojson.mesh(world, world.objects.countries, (a,b) => a !== b))
-        .attr("class","borders").attr("d",geo);
-
-      cityLayer = svg.append("g").attr("class","cities");
-      buildCities();
-      applyFilter(pendingFilter, false);
-    });
-
-  // ── Re-render all geo paths (called during rotation) ──────────────────────
   function rerenderMap() {
-    sphereEl.attr("d", geo);
-    gratEl.attr("d", geo);
+    sphereEl.attr("d", geo); gratEl.attr("d", geo);
     if (landSel)   landSel.attr("d", geo);
     if (borderSel) borderSel.attr("d", geo);
-    if (cityLayer) {
-      cityLayer.selectAll(".city-group").attr("transform", d => {
-        const [x, y] = proj([d.lng, d.lat]);
-        return `translate(${x.toFixed(1)},${y.toFixed(1)})`;
-      });
-    }
+    if (cityLayer) cityLayer.selectAll(".city-group").attr("transform", d => {
+      const [x,y] = proj([d.lng, d.lat]);
+      return `translate(${x.toFixed(1)},${y.toFixed(1)})`;
+    });
   }
 
-  // ── Rotation ──────────────────────────────────────────────────────────────
-  let rotTimer = null;
-  let isRotating = false;
-  let rotStart = 0;
-  let rotOffset = 0;
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world => {
+    landSel = svg.append("g")
+      .selectAll("path")
+      .data(topojson.feature(world, world.objects.countries).features)
+      .join("path").attr("class","land").attr("d",geo);
 
-  const rotateBtn = document.getElementById("rotateBtn");
+    borderSel = svg.append("path")
+      .datum(topojson.mesh(world, world.objects.countries, (a,b) => a !== b))
+      .attr("class","borders").attr("d",geo);
 
-  rotateBtn.addEventListener("click", () => {
-    isRotating = !isRotating;
-    rotateBtn.classList.toggle("spinning", isRotating);
-
-    if (isRotating) {
-      rotStart = performance.now() - rotOffset;
-      rotTimer = d3.timer(elapsed => {
-        // 0.006 deg/ms = ~1 full rotation every ~60 seconds — very subtle drift
-        rotAngle = (elapsed * 0.006) % 360;
-        rotOffset = elapsed;
-        proj.rotate([rotAngle, 0]);
-        rerenderMap();
-      });
-    } else {
-      if (rotTimer) { rotTimer.stop(); rotTimer = null; }
-    }
+    cityLayer = svg.append("g").attr("class","cities");
+    buildCities();
+    applyFilter(pendingFilter, false);
   });
 
-  // ── Build city rings ──────────────────────────────────────────────────────
+  // ── Build city markers ─────────────────────────────────────────────────────
   function buildCities() {
     const groups = cityLayer.selectAll(".city-group")
       .data(CITIES).join("g")
@@ -413,49 +423,53 @@
 
     groups.each(function(city, cityIdx) {
       const g = d3.select(this);
+
+      // ① Circles — shown in "all" mode, sorted largest behind
       const sorted = [...AC].sort((a,b) => city.vol[b.id] - city.vol[a.id]);
-
-      sorted.forEach((ac, ringIdx) => {
-        const r = rScale(city.vol[ac.id]);
+      sorted.forEach((ac, ri) => {
+        const r  = rScale(city.vol[ac.id]);
         if (r < 0.8) return;
-
-        const sw = Math.max(1.5, r * 0.08);
+        const sw = Math.max(1.5, r * 0.07);
 
         g.append("circle")
-          .attr("class","city-ring")
-          .attr("data-ac", ac.id)
-          // Start invisible and small — animate in on load
-          .attr("r", 0)
-          .attr("fill", ac.color)
-          .attr("fill-opacity", 0)
-          .attr("stroke", ac.color)
-          .attr("stroke-width", sw)
-          .attr("stroke-opacity", 0)
-          .transition()
-            .delay(cityIdx * 60 + ringIdx * 30)
-            .duration(900)
-            .ease(d3.easeBackOut.overshoot(0.8))
-            .attr("r", r)
-            .attr("fill-opacity", 0.45)
-            .attr("stroke-opacity", 0.85);
+          .attr("class","city-ring").attr("data-ac", ac.id)
+          .attr("r", 0).attr("fill", ac.color).attr("fill-opacity", 0)
+          .attr("stroke", ac.color).attr("stroke-width", sw).attr("stroke-opacity", 0)
+          .transition().delay(cityIdx * 55 + ri * 25).duration(850)
+          .ease(d3.easeBackOut.overshoot(0.8))
+          .attr("r", r).attr("fill-opacity", 0.45).attr("stroke-opacity", 0.85);
       });
 
+      // ② Custom shapes — hidden in "all" mode, shown when filtered
+      AC.forEach((ac, ai) => {
+        const r    = rScale(city.vol[ac.id]);
+        if (r < 0.8) return;
+        const area = Math.PI * r * r;
+        const pathD = d3.symbol().type(ac.sym()).size(area)();
+        const sw   = Math.max(1.5, r * 0.06);
+
+        g.append("path")
+          .attr("class","city-shape").attr("data-ac", ac.id)
+          .attr("d", pathD)
+          .attr("fill", ac.color).attr("fill-opacity", 0)
+          .attr("stroke", ac.color).attr("stroke-width", sw).attr("stroke-opacity", 0);
+      });
+
+      // ③ Label
       const maxR = rScale(d3.max(Object.values(city.vol)));
       g.append("text")
         .attr("class","city-label")
         .attr("x", maxR + 6).attr("y", 0).attr("dy","0.35em")
         .style("opacity", 0)
         .text(`${city.flag} ${city.name}`)
-        .transition()
-          .delay(cityIdx * 60 + 500)
-          .duration(500)
-          .style("opacity", 1);
+        .transition().delay(cityIdx * 55 + 600).duration(500)
+        .style("opacity", 1);
     });
 
     groups
       .on("mouseover", (e,d) => showTip(e,d))
-      .on("mousemove",       moveTip)
-      .on("mouseleave",      hideTip);
+      .on("mousemove", moveTip)
+      .on("mouseleave", hideTip);
   }
 
   // ── Filter ────────────────────────────────────────────────────────────────
@@ -464,57 +478,96 @@
   function applyFilter(key, animate = true) {
     activeFilter = key;
     if (!cityLayer) { pendingFilter = key; return; }
+    const dur = animate ? 560 : 0;
 
-    const dur = animate ? 600 : 0;
+    if (key === "all") {
+      // Show circles, hide shapes
+      cityLayer.selectAll(".city-ring").interrupt()
+        .transition().duration(dur).ease(d3.easeCubicInOut)
+        .attr("fill-opacity", 0.45).attr("stroke-opacity", 0.85).attr("filter", null);
 
-    cityLayer.selectAll(".city-ring")
-      .interrupt()
-      .transition().duration(dur).ease(d3.easeCubicInOut)
-      .attr("stroke-opacity", function() {
-        const id = this.getAttribute("data-ac");
-        if (key === "all") return 0.85;
-        return id === key ? 0.95 : 0.08;
-      })
-      .attr("fill-opacity", function() {
-        const id = this.getAttribute("data-ac");
-        if (key === "all") return 0.45;
-        return id === key ? 0.60 : 0.04;
-      })
-      .attr("filter", function() {
-        const id = this.getAttribute("data-ac");
-        if (key === "all" || id !== key) return null;
-        return `url(#glow-${id})`;
-      });
+      cityLayer.selectAll(".city-shape").interrupt()
+        .transition().duration(dur / 2)
+        .attr("fill-opacity", 0).attr("stroke-opacity", 0).attr("filter", null);
+
+    } else {
+      // Fade circles (keep selected one faint for context)
+      cityLayer.selectAll(".city-ring").interrupt()
+        .transition().duration(dur).ease(d3.easeCubicInOut)
+        .attr("fill-opacity", function() {
+          return this.getAttribute("data-ac") === key ? 0.08 : 0.03;
+        })
+        .attr("stroke-opacity", function() {
+          return this.getAttribute("data-ac") === key ? 0.15 : 0.04;
+        })
+        .attr("filter", null);
+
+      // Hide non-selected shapes
+      cityLayer.selectAll(".city-shape").interrupt()
+        .filter(function() { return this.getAttribute("data-ac") !== key; })
+        .transition().duration(dur / 2)
+        .attr("fill-opacity", 0).attr("stroke-opacity", 0).attr("filter", null);
+
+      // Pop in selected shapes with bounce
+      cityLayer.selectAll(`.city-shape[data-ac="${key}"]`).interrupt()
+        .transition().duration(dur).ease(d3.easeBackOut.overshoot(1.1))
+        .attr("fill-opacity", 0.55)
+        .attr("stroke-opacity", 0.92)
+        .attr("filter", `url(#glow-${key})`);
+    }
 
     refreshLegend(key);
     refreshStats(key);
+    refreshDescriptor(key);
   }
 
   // ── Legend ────────────────────────────────────────────────────────────────
   (function buildLegend() {
     document.getElementById("legend").innerHTML = AC.map(ac => `
       <div class="legend-item lit" data-id="${ac.id}">
-        <div class="legend-swatch" style="background:${ac.color}"></div>
+        <div class="legend-icon-wrap">${symSvg(ac.id, 6, ac.color, 0.85)}</div>
         <span>${ac.label}</span>
       </div>`).join("");
   })();
 
   function refreshLegend(key) {
     document.querySelectorAll(".legend-item").forEach(el => {
-      const id = el.getAttribute("data-id");
-      const on = key === "all" || id === key;
+      const id  = el.getAttribute("data-id");
+      const on  = key === "all" || id === key;
+      const ac  = AC_MAP[id];
       el.classList.toggle("lit", on);
-      el.querySelector(".legend-swatch").style.opacity = on ? "1" : "0.15";
+      const wrap = el.querySelector(".legend-icon-wrap");
+      wrap.innerHTML = symSvg(id, 6, ac.color, on ? 0.85 : 0.2);
     });
+  }
+
+  // ── Descriptor banner ─────────────────────────────────────────────────────
+  function refreshDescriptor(key) {
+    const el = document.getElementById("descriptor");
+    if (key === "all") {
+      el.classList.remove("visible");
+      return;
+    }
+    const ac = AC_MAP[key];
+    document.getElementById("descIcon").innerHTML = symSvg(key, 11, ac.color, 0.9);
+    document.getElementById("descIcon").style.background = ac.bg;
+    document.getElementById("descName").style.color = ac.color;
+    document.getElementById("descName").textContent  = ac.icon + "  " + ac.label;
+    document.getElementById("descText").textContent  = ac.desc;
+    el.style.borderColor = ac.color + "44";
+    el.classList.add("visible");
   }
 
   // ── Stats ─────────────────────────────────────────────────────────────────
   (function buildStats() {
-    document.getElementById("stats").innerHTML = STATS.map(s => `
-      <div class="stat-card lit" data-id="${s.id}">
+    document.getElementById("stats").innerHTML = STATS.map(s => {
+      const ac = AC_MAP[s.id];
+      return `<div class="stat-card lit" data-id="${s.id}"
+        style="--ac-color:${ac.color}; --ac-bg:${ac.bg}">
         <div class="stat-val">${s.val}</div>
         <div class="stat-lbl">${s.lbl}</div>
-      </div>`).join("");
+      </div>`;
+    }).join("");
   })();
 
   function refreshStats(key) {
@@ -529,14 +582,17 @@
   function fmt(v) { return v >= 1000 ? `$${(v/1000).toFixed(1)}T` : `$${v}B`; }
 
   function showTip(evt, city) {
-    tip.innerHTML = `
-      <div class="tip-city">${city.flag} ${city.name}</div>
-      ${AC.map(ac => `
-        <div class="tip-row">
-          <div class="tip-dot" style="background:${ac.color}"></div>
-          <span class="tip-lbl">${ac.label}</span>
-          <span class="tip-val">${fmt(city.vol[ac.id])}</span>
-        </div>`).join("")}`;
+    const filt = activeFilter;
+    const rows = AC.map(ac => {
+      const hi = filt !== "all" && ac.id === filt;
+      return `<div class="tip-row${hi ? " tip-highlight" : ""}">
+        <div class="tip-shape">${symSvg(ac.id, 5, ac.color, hi ? 0.9 : 0.5)}</div>
+        <span class="tip-lbl">${ac.label}</span>
+        <span class="tip-val">${fmt(city.vol[ac.id])}</span>
+      </div>`;
+    }).join("");
+
+    tip.innerHTML = `<div class="tip-city">${city.flag} ${city.name}</div>${rows}`;
     tip.classList.add("show");
     moveTip(evt);
   }
@@ -545,13 +601,22 @@
     const box = mapWrap.getBoundingClientRect();
     let x = evt.clientX - box.left + 14;
     let y = evt.clientY - box.top - 12;
-    if (x + 220 > box.width)  x -= 235;
-    if (y + 220 > box.height) y -= 215;
+    if (x + 225 > box.width)  x -= 240;
+    if (y + 230 > box.height) y -= 225;
     tip.style.left = x + "px";
     tip.style.top  = y + "px";
   }
-
   function hideTip() { tip.classList.remove("show"); }
+
+  // ── Rotation ──────────────────────────────────────────────────────────────
+  let rotTimer = null, isRotating = false;
+  document.getElementById("rotateBtn").addEventListener("click", function() {
+    isRotating = !isRotating;
+    this.classList.toggle("spinning", isRotating);
+    if (isRotating) {
+      rotTimer = d3.timer(e => { proj.rotate([e * 0.006 % 360, 0]); rerenderMap(); });
+    } else { if (rotTimer) { rotTimer.stop(); rotTimer = null; } }
+  });
 
   // ── Filter buttons ─────────────────────────────────────────────────────────
   document.getElementById("filters").addEventListener("click", e => {
