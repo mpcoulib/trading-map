@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The World's Top 25 Stock Exchanges</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #f7f6f2;
+      color: #1a1a1a;
+      font-family: 'Inter', system-ui, sans-serif;
+      padding: 48px 60px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .header-text .eyebrow {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #999;
+      margin-bottom: 4px;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: #111;
+    }
+
+    .subtitle {
+      font-size: 0.92rem;
+      color: #666;
+      line-height: 1.75;
+      margin-top: 10px;
+      max-width: 520px;
+    }
+
+    .nav-link {
+      font-size: 0.8rem;
+      color: #1d4ed8;
+      text-decoration: none;
+      border: 1px solid #1d4ed8;
+      border-radius: 9999px;
+      padding: 5px 14px;
+      transition: all 0.2s;
+    }
+    .nav-link:hover { background: #1d4ed8; color: #fff; }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 24px 0 16px;
+    }
+
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .filter-btn {
+      padding: 6px 16px;
+      border-radius: 9999px;
+      border: 1.5px solid #d4d4d4;
+      background: #fff;
+      color: #666;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      outline: none;
+      user-select: none;
+    }
+    .filter-btn:hover { border-color: #999; color: #222; }
+    .filter-btn.active {
+      color: #fff;
+      font-weight: 600;
+      border-color: transparent;
+    }
+    .filter-btn[data-filter="all"].active     { background: #374151; }
+    .filter-btn[data-filter="americas"].active { background: #1d4ed8; }
+    .filter-btn[data-filter="emea"].active     { background: #ea580c; }
+    .filter-btn[data-filter="asia"].active     { background: #ca8a04; }
+
+    .rotate-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      border: 1.5px solid #d4d4d4;
+      background: #fff;
+      color: #666;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .rotate-btn:hover { border-color: #999; color: #333; }
+    .rotate-btn.spinning { border-color: #374151; color: #374151; background: #f4f4f5; }
+    .rotate-icon { display: inline-block; font-size: 14px; }
+    .rotate-btn.spinning .rotate-icon { animation: spin 2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      color: #aaa;
+      transition: color 0.3s;
+    }
+    .legend-item.lit { color: #333; }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      transition: opacity 0.3s;
+    }
+
+    /* ── Map ── */
+    #map-wrap {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #e0ddd6;
+      background: #edf1f7;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+    #map { width: 100%; display: block; }
+
+    .sphere  { fill: #cdddf0; }
+    .grat    { fill: none; stroke: #bdd0e8; stroke-width: 0.4; }
+    .land    { fill: #dedcd7; }
+    .borders { fill: none; stroke: #cac7c1; stroke-width: 0.4; }
+
+    .exch-label {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 10px;
+      fill: #666;
+      pointer-events: none;
+      user-select: none;
+    }
+    .exch-group { cursor: pointer; }
+
+    /* ── Tooltip ── */
+    #tip {
+      position: absolute;
+      background: rgba(255,255,255,0.98);
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 13px 15px;
+      pointer-events: none;
+      font-size: 0.8rem;
+      min-width: 210px;
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 10;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    }
+    #tip.show { opacity: 1; }
+    .tip-header { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+    .tip-rank { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #999; }
+    .tip-name { font-size: 0.93rem; font-weight: 700; color: #111; margin-top: 2px; }
+    .tip-city { font-size: 0.78rem; color: #888; margin-top: 1px; }
+    .tip-row  { display: flex; justify-content: space-between; padding: 2px 0; font-size: 0.8rem; }
+    .tip-lbl  { color: #888; }
+    .tip-val  { font-weight: 600; color: #222; }
+    .tip-region-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* ── Bottom section ── */
+    .bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 18px;
+    }
+
+    .bottom-card {
+      background: #fff;
+      border: 1.5px solid #e8e6e0;
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .bottom-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 4px;
+    }
+    .bottom-sub {
+      font-size: 0.73rem;
+      color: #aaa;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    /* Bar chart */
+    .bar-chart { display: flex; flex-direction: column; gap: 14px; }
+    .bar-row { display: flex; align-items: center; gap: 12px; }
+    .bar-year { font-size: 0.78rem; color: #888; width: 34px; flex-shrink: 0; }
+    .bar-track {
+      flex: 1;
+      height: 32px;
+      background: #f0eee9;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      transition: width 1s ease;
+    }
+    .bar-val {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .bar-fill-2016 { background: #93c5fd; width: 0; }
+    .bar-fill-2023 { background: #1d4ed8; width: 0; }
+
+    /* Donut charts */
+    .donuts { display: flex; justify-content: space-around; align-items: center; }
+    .donut-wrap { text-align: center; }
+    .donut-svg { display: block; margin: 0 auto; overflow: visible; }
+    .donut-pct {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .donut-lbl {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #555;
+      margin-top: 6px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    /* Source */
+    .source {
+      font-size: 0.68rem;
+      color: #bbb;
+      margin-top: 16px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-text">
+      <div class="eyebrow">The World's</div>
+      <h1>Top 25 Stock Exchanges</h1>
+      <p class="subtitle">
+        The largest stock exchanges in the world, spanning
+        <strong>$106T</strong> in total market capitalization as of 2023.
+        Bubble size reflects market cap. Numbers show global rank.
+      </p>
+    </div>
+    <a href="index.html" class="nav-link">← Trading Map</a>
+  </div>
+
+  <div class="controls">
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="all">All Regions</button>
+      <button class="filter-btn" data-filter="americas">Americas</button>
+      <button class="filter-btn" data-filter="emea">Europe, Middle East &amp; Africa</button>
+      <button class="filter-btn" data-filter="asia">Asia-Pacific</button>
+    </div>
+    <button class="rotate-btn" id="rotateBtn">
+      <span class="rotate-icon">↻</span> Rotate map
+    </button>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div id="map-wrap">
+    <svg id="map"></svg>
+    <div id="tip"></div>
+  </div>
+
+  <div class="bottom">
+    <div class="bottom-card">
+      <div class="bottom-title">Total Market Value</div>
+      <div class="bottom-sub">All major stock exchanges</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <span class="bar-year">2016</span>
+          <div class="bar-track">
+            <div class="bar-fill bar-fill-2016" id="bar2016">
+              <span class="bar-val">$69T</span>
+            </div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-year">2023</span>
+          <div class="bar-track">
+            <div class="bar-fill bar-fill-2023" id="bar2023">
+              <span class="bar-val">$110T</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-card">
+      <div class="bottom-title">Market Share</div>
+      <div class="bottom-sub">All major stock exchanges</div>
+      <div class="donuts">
+
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="34" fill="none" stroke="#e8e6e0" stroke-width="9"/>
+            <circle cx="45" cy="45" r="34" fill="none" stroke="#1d4ed8" stroke-width="9"
+              stroke-dasharray="0 213.6" stroke-dashoffset="53.4" stroke-linecap="round"
+              class="donut-arc" data-pct="0.47" style="transform-origin:45px 45px; transform:rotate(-90deg)"/>
+            <text x="45" y="45" text-anchor="middle" dominant-baseline="central"
+              class="donut-pct" fill="#1d4ed8">47%</text>
+          </svg>
+          <div class="donut-lbl">Americas</div>
+        </div>
+
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="34" fill="none" stroke="#e8e6e0" stroke-width="9"/>
+            <circle cx="45" cy="45" r="34" fill="none" stroke="#ea580c" stroke-width="9"
+              stroke-dasharray="0 213.6" stroke-dashoffset="53.4" stroke-linecap="round"
+              class="donut-arc" data-pct="0.24" style="transform-origin:45px 45px; transform:rotate(-90deg)"/>
+            <text x="45" y="45" text-anchor="middle" dominant-baseline="central"
+              class="donut-pct" fill="#ea580c">24%</text>
+          </svg>
+          <div class="donut-lbl">Europe, Middle East<br>and Africa</div>
+        </div>
+
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="34" fill="none" stroke="#e8e6e0" stroke-width="9"/>
+            <circle cx="45" cy="45" r="34" fill="none" stroke="#ca8a04" stroke-width="9"
+              stroke-dasharray="0 213.6" stroke-dashoffset="53.4" stroke-linecap="round"
+              class="donut-arc" data-pct="0.29" style="transform-origin:45px 45px; transform:rotate(-90deg)"/>
+            <text x="45" y="45" text-anchor="middle" dominant-baseline="central"
+              class="donut-pct" fill="#ca8a04">29%</text>
+          </svg>
+          <div class="donut-lbl">Asia-Pacific</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <p class="source">Data as of August 2023 · Source: World Federation of Exchanges</p>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script>
+  // ── Data ──────────────────────────────────────────────────────────────────
+  const EXCHANGES = [
+    { rank: 1,  name:"NYSE",                      city:"New York",      region:"americas", lat: 40.71, lng: -74.01, cap: 25.0 },
+    { rank: 2,  name:"NASDAQ",                    city:"New York",      region:"americas", lat: 40.80, lng: -73.88, cap: 21.0 },
+    { rank: 3,  name:"Euronext",                  city:"Amsterdam",     region:"emea",     lat: 52.37, lng:   4.90, cap: 7.2  },
+    { rank: 4,  name:"Shanghai Stock Exchange",   city:"Shanghai",      region:"asia",     lat: 31.23, lng: 121.47, cap: 6.6  },
+    { rank: 5,  name:"Japan Exchange Group",      city:"Tokyo",         region:"asia",     lat: 35.69, lng: 139.69, cap: 5.9  },
+    { rank: 6,  name:"Shenzhen Stock Exchange",   city:"Shenzhen",      region:"asia",     lat: 22.54, lng: 113.95, cap: 4.9  },
+    { rank: 7,  name:"Hong Kong Exchanges",       city:"Hong Kong",     region:"asia",     lat: 22.28, lng: 114.21, cap: 4.3  },
+    { rank: 8,  name:"NSE of India",              city:"Mumbai",        region:"asia",     lat: 19.12, lng:  72.86, cap: 3.5  },
+    { rank: 9,  name:"LSE Group",                 city:"London",        region:"emea",     lat: 51.51, lng:  -0.13, cap: 3.2  },
+    { rank: 10, name:"SIX Swiss Exchange",        city:"Zurich",        region:"emea",     lat: 47.38, lng:   8.54, cap: 2.4  },
+    { rank: 11, name:"TMX Group",                 city:"Toronto",       region:"americas", lat: 43.65, lng: -79.38, cap: 2.9  },
+    { rank: 12, name:"Saudi Exchange",            city:"Riyadh",        region:"emea",     lat: 24.69, lng:  46.72, cap: 2.8  },
+    { rank: 13, name:"Korea Exchange",            city:"Seoul",         region:"asia",     lat: 37.57, lng: 126.98, cap: 2.0  },
+    { rank: 14, name:"Deutsche Boerse AG",        city:"Frankfurt",     region:"emea",     lat: 50.11, lng:   8.68, cap: 1.9  },
+    { rank: 15, name:"BSE India",                 city:"Mumbai",        region:"asia",     lat: 18.93, lng:  72.82, cap: 3.3  },
+    { rank: 16, name:"Tehran Stock Exchange",     city:"Tehran",        region:"emea",     lat: 35.69, lng:  51.39, cap: 1.4  },
+    { rank: 17, name:"ASX",                       city:"Sydney",        region:"asia",     lat:-33.87, lng: 151.21, cap: 1.7  },
+    { rank: 18, name:"Taiwan Stock Exchange",     city:"Taipei",        region:"asia",     lat: 25.05, lng: 121.56, cap: 1.7  },
+    { rank: 19, name:"Johannesburg SE",           city:"Johannesburg",  region:"emea",     lat:-26.20, lng:  28.04, cap: 1.0  },
+    { rank: 20, name:"B3 – Brazil",               city:"São Paulo",     region:"americas", lat:-23.55, lng: -46.63, cap: 0.9  },
+    { rank: 21, name:"BME Spanish Exchanges",     city:"Madrid",        region:"emea",     lat: 40.42, lng:  -3.70, cap: 0.8  },
+    { rank: 22, name:"Nasdaq Nordic & Baltics",   city:"Stockholm",     region:"emea",     lat: 59.33, lng:  18.07, cap: 1.6  },
+    { rank: 23, name:"Singapore Exchange",        city:"Singapore",     region:"asia",     lat:  1.35, lng: 103.82, cap: 0.7  },
+    { rank: 24, name:"Stock Exch. of Thailand",   city:"Bangkok",       region:"asia",     lat: 13.76, lng: 100.50, cap: 0.6  },
+    { rank: 25, name:"Bolsa Mexicana de Valores", city:"Mexico City",   region:"americas", lat: 19.43, lng: -99.13, cap: 0.4  },
+  ];
+
+  const REGIONS = {
+    americas: { label: "Americas",              color: "#1d4ed8" },
+    emea:     { label: "Europe, M.E. & Africa", color: "#ea580c" },
+    asia:     { label: "Asia-Pacific",          color: "#ca8a04" },
+  };
+
+  // ── Scales ────────────────────────────────────────────────────────────────
+  const maxCap = d3.max(EXCHANGES, d => d.cap);
+  // Scale: largest exchange (NYSE $25T) → 68px radius
+  const rScale = d3.scaleSqrt().domain([0, maxCap]).range([0, 68]);
+
+  // ── SVG setup ─────────────────────────────────────────────────────────────
+  const mapWrap = document.getElementById("map-wrap");
+  const W = mapWrap.clientWidth || 1100;
+  const H = Math.round(W * 0.52);
+
+  const svg = d3.select("#map")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
+
+  // Glow filter (for filtered/highlighted state)
+  const defs = svg.append("defs");
+  Object.entries(REGIONS).forEach(([key, reg]) => {
+    const f = defs.append("filter").attr("id", `glow-${key}`)
+      .attr("x","-60%").attr("y","-60%").attr("width","220%").attr("height","220%");
+    f.append("feGaussianBlur").attr("in","SourceGraphic").attr("stdDeviation","5").attr("result","blur");
+    const fm = f.append("feMerge");
+    fm.append("feMergeNode").attr("in","blur");
+    fm.append("feMergeNode").attr("in","SourceGraphic");
+  });
+
+  // ── Projection ────────────────────────────────────────────────────────────
+  let rotAngle = 0;
+  const proj = d3.geoNaturalEarth1()
+    .scale(W / 6.3)
+    .translate([W / 2, H / 2])
+    .rotate([rotAngle, 0]);
+  const geo = d3.geoPath().projection(proj);
+
+  // ── Base layers (re-rendered on rotate) ───────────────────────────────────
+  const sphereEl  = svg.append("path").datum({type:"Sphere"}).attr("class","sphere").attr("d",geo);
+  const gratEl    = svg.append("path").datum(d3.geoGraticule10()).attr("class","grat").attr("d",geo);
+  let landSel, borderSel, exchLayer;
+
+  function rerenderMap() {
+    sphereEl.attr("d", geo);
+    gratEl.attr("d", geo);
+    if (landSel)   landSel.attr("d", geo);
+    if (borderSel) borderSel.attr("d", geo);
+    if (exchLayer) {
+      exchLayer.selectAll(".exch-group").attr("transform", d => {
+        const [x,y] = proj([d.lng, d.lat]);
+        return `translate(${x.toFixed(1)},${y.toFixed(1)})`;
+      });
+    }
+  }
+
+  // ── Load world ────────────────────────────────────────────────────────────
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
+    .then(world => {
+      landSel = svg.append("g")
+        .selectAll("path")
+        .data(topojson.feature(world, world.objects.countries).features)
+        .join("path").attr("class","land").attr("d",geo);
+
+      borderSel = svg.append("path")
+        .datum(topojson.mesh(world, world.objects.countries, (a,b) => a !== b))
+        .attr("class","borders").attr("d",geo);
+
+      exchLayer = svg.append("g").attr("class","exchanges");
+      buildExchanges();
+      applyFilter("all", false);
+    });
+
+  // ── Build exchange bubbles ─────────────────────────────────────────────────
+  function buildExchanges() {
+    // Sort ascending by cap so largest bubbles render last (on top)
+    const sorted = [...EXCHANGES].sort((a,b) => a.cap - b.cap);
+
+    const groups = exchLayer.selectAll(".exch-group")
+      .data(sorted, d => d.rank)
+      .join("g")
+      .attr("class","exch-group")
+      .attr("data-region", d => d.region)
+      .attr("transform", d => {
+        const [x,y] = proj([d.lng, d.lat]);
+        return `translate(${x.toFixed(1)},${y.toFixed(1)})`;
+      });
+
+    groups.each(function(exch, i) {
+      const g    = d3.select(this);
+      const r    = rScale(exch.cap);
+      const col  = REGIONS[exch.region].color;
+      const delay = i * 55;
+
+      // Filled circle — animate from r=0
+      g.append("circle")
+        .attr("class","exch-bubble")
+        .attr("r", 0)
+        .attr("fill", col)
+        .attr("fill-opacity", 0)
+        .attr("stroke", col)
+        .attr("stroke-width", Math.max(1, r * 0.04))
+        .attr("stroke-opacity", 0)
+        .transition()
+          .delay(delay)
+          .duration(850)
+          .ease(d3.easeBackOut.overshoot(0.7))
+          .attr("r", r)
+          .attr("fill-opacity", 0.50)
+          .attr("stroke-opacity", 0.90);
+
+      // Rank number inside the bubble
+      const fontSize = Math.max(8, Math.min(14, r * 0.42));
+      g.append("text")
+        .attr("class","exch-rank")
+        .attr("text-anchor","middle")
+        .attr("dominant-baseline","central")
+        .attr("font-size", fontSize)
+        .attr("font-weight","800")
+        .attr("font-family","Inter, system-ui, sans-serif")
+        .attr("fill","#fff")
+        .attr("pointer-events","none")
+        .style("opacity", 0)
+        .text(exch.rank)
+        .transition()
+          .delay(delay + 400)
+          .duration(400)
+          .style("opacity", 1);
+    });
+
+    groups
+      .on("mouseover", (e,d) => showTip(e,d))
+      .on("mousemove",        moveTip)
+      .on("mouseleave",       hideTip);
+  }
+
+  // ── Filter ────────────────────────────────────────────────────────────────
+  let activeFilter = "all";
+
+  function applyFilter(key, animate = true) {
+    activeFilter = key;
+    if (!exchLayer) return;
+    const dur = animate ? 550 : 0;
+
+    exchLayer.selectAll(".exch-group").each(function(d) {
+      const g   = d3.select(this);
+      const on  = key === "all" || d.region === key;
+      const col = REGIONS[d.region].color;
+
+      g.select(".exch-bubble")
+        .interrupt()
+        .transition().duration(dur).ease(d3.easeCubicInOut)
+        .attr("fill-opacity",   on ? 0.52 : 0.06)
+        .attr("stroke-opacity", on ? 0.90 : 0.12)
+        .attr("filter", (key !== "all" && on) ? `url(#glow-${d.region})` : null);
+
+      g.select(".exch-rank")
+        .interrupt()
+        .transition().duration(dur)
+        .style("opacity", on ? 1 : 0.15);
+    });
+
+    refreshLegend(key);
+  }
+
+  // ── Legend ────────────────────────────────────────────────────────────────
+  (function buildLegend() {
+    document.getElementById("legend").innerHTML =
+      Object.entries(REGIONS).map(([key, reg]) => `
+        <div class="legend-item lit" data-id="${key}">
+          <div class="legend-dot" style="background:${reg.color}"></div>
+          <span>${reg.label}</span>
+        </div>`).join("");
+  })();
+
+  function refreshLegend(key) {
+    document.querySelectorAll(".legend-item").forEach(el => {
+      const id = el.getAttribute("data-id");
+      const on = key === "all" || id === key;
+      el.classList.toggle("lit", on);
+      el.querySelector(".legend-dot").style.opacity = on ? "1" : "0.2";
+    });
+  }
+
+  // ── Filter buttons ─────────────────────────────────────────────────────────
+  document.getElementById("filters").addEventListener("click", e => {
+    const btn = e.target.closest(".filter-btn");
+    if (!btn) return;
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    applyFilter(btn.dataset.filter);
+  });
+
+  // ── Rotation ──────────────────────────────────────────────────────────────
+  let rotTimer = null;
+  let isRotating = false;
+
+  document.getElementById("rotateBtn").addEventListener("click", function() {
+    isRotating = !isRotating;
+    this.classList.toggle("spinning", isRotating);
+    if (isRotating) {
+      rotTimer = d3.timer(elapsed => {
+        proj.rotate([elapsed * 0.006 % 360, 0]);
+        rerenderMap();
+      });
+    } else {
+      if (rotTimer) { rotTimer.stop(); rotTimer = null; }
+    }
+  });
+
+  // ── Tooltip ───────────────────────────────────────────────────────────────
+  const tip = document.getElementById("tip");
+
+  const REGION_BADGE_COLORS = { americas:"#1d4ed8", emea:"#ea580c", asia:"#ca8a04" };
+  const REGION_LABELS = { americas:"Americas", emea:"Europe, M.E. & Africa", asia:"Asia-Pacific" };
+
+  function showTip(evt, exch) {
+    const col = REGION_BADGE_COLORS[exch.region];
+    tip.innerHTML = `
+      <div class="tip-header">
+        <div class="tip-rank">Rank #${exch.rank}</div>
+        <div class="tip-name">${exch.name}</div>
+        <div class="tip-city">${exch.city}</div>
+        <span class="tip-region-badge" style="background:${col}">${REGION_LABELS[exch.region]}</span>
+      </div>
+      <div class="tip-row">
+        <span class="tip-lbl">Market Cap (2023)</span>
+        <span class="tip-val">$${exch.cap.toFixed(1)}T</span>
+      </div>
+      <div class="tip-row">
+        <span class="tip-lbl">Global share</span>
+        <span class="tip-val">${(exch.cap / 106 * 100).toFixed(1)}%</span>
+      </div>`;
+    tip.classList.add("show");
+    moveTip(evt);
+  }
+
+  function moveTip(evt) {
+    const box = mapWrap.getBoundingClientRect();
+    let x = evt.clientX - box.left + 14;
+    let y = evt.clientY - box.top - 12;
+    if (x + 230 > box.width)  x -= 245;
+    if (y + 190 > box.height) y -= 185;
+    tip.style.left = x + "px";
+    tip.style.top  = y + "px";
+  }
+  function hideTip() { tip.classList.remove("show"); }
+
+  // ── Animate bar chart on load ──────────────────────────────────────────────
+  setTimeout(() => {
+    document.getElementById("bar2016").style.width = "63%";
+    document.getElementById("bar2023").style.width = "100%";
+  }, 600);
+
+  // ── Animate donut arcs on load ─────────────────────────────────────────────
+  // r=34, circumference = 2π*34 ≈ 213.6
+  const C = 2 * Math.PI * 34;
+  setTimeout(() => {
+    document.querySelectorAll(".donut-arc").forEach(el => {
+      const pct = parseFloat(el.getAttribute("data-pct"));
+      el.setAttribute("stroke-dasharray", `${pct * C} ${C}`);
+      el.style.transition = "stroke-dasharray 1.1s ease";
+    });
+  }, 500);
+  </script>
+</body>
+</html>
