@@ -33,17 +33,20 @@
       line-height: 1.8;
       margin-bottom: 6px;
     }
-
     .subtitle em { font-style: italic; color: #444; }
     .subtitle .hl { color: #1d4ed8; font-weight: 500; }
 
-    /* ── Filter buttons ── */
-    .filters {
+    /* ── Controls row ── */
+    .controls {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 12px;
       margin: 28px 0 18px;
     }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
 
     .filter-btn {
       padding: 7px 18px;
@@ -60,19 +63,51 @@
       user-select: none;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
-
-    .filter-btn:hover {
-      border-color: #999;
-      color: #222;
-      background: #fafafa;
-    }
-
+    .filter-btn:hover { border-color: #999; color: #222; background: #fafafa; }
     .filter-btn.active {
       background: #1d4ed8;
       border-color: #1d4ed8;
       color: #fff;
       font-weight: 500;
       box-shadow: 0 2px 8px rgba(29,78,216,0.3);
+    }
+
+    /* ── Rotate toggle ── */
+    .rotate-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      border-radius: 9999px;
+      border: 1.5px solid #d4d4d4;
+      background: #fff;
+      color: #666;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+      user-select: none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      white-space: nowrap;
+    }
+    .rotate-btn:hover { border-color: #999; color: #222; }
+    .rotate-btn.spinning {
+      border-color: #1d4ed8;
+      color: #1d4ed8;
+      background: #eff4ff;
+    }
+    .rotate-icon {
+      font-size: 13px;
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+    .rotate-btn.spinning .rotate-icon {
+      animation: spin-icon 2s linear infinite;
+    }
+    @keyframes spin-icon {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
     }
 
     /* ── Legend ── */
@@ -83,23 +118,20 @@
       margin-bottom: 14px;
       align-items: center;
     }
-
     .legend-item {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 0.78rem;
-      color: #aaa;
-      transition: color 0.35s;
+      color: #bbb;
+      transition: color 0.4s;
     }
-
     .legend-item.lit { color: #333; }
-
     .legend-swatch {
       width: 22px;
-      height: 3.5px;
+      height: 3px;
       border-radius: 2px;
-      transition: opacity 0.35s;
+      transition: opacity 0.4s;
     }
 
     /* ── Map ── */
@@ -111,14 +143,13 @@
       background: #eef2f7;
       box-shadow: 0 4px 24px rgba(0,0,0,0.07);
     }
-
     #map { width: 100%; display: block; }
 
-    /* ── SVG geo styles ── */
-    .sphere   { fill: #d6e4f0; }
-    .grat     { fill: none; stroke: #c4d8eb; stroke-width: 0.5; }
-    .land     { fill: #dcdad4; }
-    .borders  { fill: none; stroke: #c5c2bc; stroke-width: 0.5; }
+    /* ── SVG geo ── */
+    .sphere  { fill: #d6e4f0; }
+    .grat    { fill: none; stroke: #c4d8eb; stroke-width: 0.4; }
+    .land    { fill: #dcdad4; }
+    .borders { fill: none; stroke: #c8c5bf; stroke-width: 0.4; }
 
     .city-label {
       font-family: 'Inter', system-ui, sans-serif;
@@ -127,7 +158,6 @@
       pointer-events: none;
       user-select: none;
     }
-
     .city-group { cursor: pointer; }
     .city-group:hover .city-label { fill: #111; }
 
@@ -146,9 +176,7 @@
       z-index: 10;
       box-shadow: 0 8px 28px rgba(0,0,0,0.12);
     }
-
     #tip.show { opacity: 1; }
-
     .tip-city {
       font-size: 0.92rem;
       font-weight: 600;
@@ -157,15 +185,8 @@
       padding-bottom: 9px;
       border-bottom: 1px solid #eee;
     }
-
-    .tip-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 3px 0;
-    }
-
-    .tip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .tip-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+    .tip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .tip-lbl { color: #888; flex: 1; font-size: 0.77rem; }
     .tip-val { font-weight: 600; color: #222; font-size: 0.82rem; }
 
@@ -176,7 +197,6 @@
       gap: 10px;
       margin-top: 16px;
     }
-
     .stat-card {
       background: #fff;
       border: 1.5px solid #e8e6e0;
@@ -185,13 +205,11 @@
       transition: border-color 0.4s, background 0.4s, box-shadow 0.4s;
       box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
-
     .stat-card.lit {
       border-color: #1d4ed8;
       background: #eff4ff;
       box-shadow: 0 2px 12px rgba(29,78,216,0.12);
     }
-
     .stat-val {
       font-size: 1.65rem;
       font-weight: 700;
@@ -200,7 +218,6 @@
       margin-bottom: 8px;
       color: #111;
     }
-
     .stat-lbl {
       font-size: 0.65rem;
       text-transform: uppercase;
@@ -222,16 +239,21 @@
   <p class="subtitle" style="margin-top:7px">
     Each set of rings represents a major financial center.
     Size shows <span class="hl">daily trading volume</span>.
-    Pick an asset class to see where it's traded — and how the map changes dramatically.
+    Pick an asset class to see where it's traded.
   </p>
 
-  <div class="filters" id="filters">
-    <button class="filter-btn active" data-filter="all">All</button>
-    <button class="filter-btn" data-filter="fx">Foreign Exchange</button>
-    <button class="filter-btn" data-filter="eq">Equities</button>
-    <button class="filter-btn" data-filter="bd">Bonds</button>
-    <button class="filter-btn" data-filter="cm">Commodities</button>
-    <button class="filter-btn" data-filter="cr">Crypto</button>
+  <div class="controls">
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="fx">Foreign Exchange</button>
+      <button class="filter-btn" data-filter="eq">Equities</button>
+      <button class="filter-btn" data-filter="bd">Bonds</button>
+      <button class="filter-btn" data-filter="cm">Commodities</button>
+      <button class="filter-btn" data-filter="cr">Crypto</button>
+    </div>
+    <button class="rotate-btn" id="rotateBtn">
+      <span class="rotate-icon">↻</span> Rotate map
+    </button>
   </div>
 
   <div class="legend" id="legend"></div>
@@ -261,13 +283,12 @@
     { name:"Dubai",     flag:"🇦🇪", lat: 25.205, lng:  55.271, vol:{fx:60,  eq:30,  bd:25, cm:80, cr:5 } },
   ];
 
-  // High-contrast palette — readable on projectors in bright rooms
   const AC = [
-    { id:"fx", label:"Foreign Exchange", color:"#1d4ed8" },  // deep blue
-    { id:"eq", label:"Equities",         color:"#15803d" },  // forest green
-    { id:"bd", label:"Bonds",            color:"#7e22ce" },  // deep violet
-    { id:"cm", label:"Commodities",      color:"#b45309" },  // warm amber
-    { id:"cr", label:"Crypto",           color:"#0e7490" },  // teal
+    { id:"fx", label:"Foreign Exchange", color:"#1d4ed8" },
+    { id:"eq", label:"Equities",         color:"#15803d" },
+    { id:"bd", label:"Bonds",            color:"#7e22ce" },
+    { id:"cm", label:"Commodities",      color:"#b45309" },
+    { id:"cr", label:"Crypto",           color:"#0e7490" },
   ];
 
   const STATS = [
@@ -280,9 +301,9 @@
 
   // ── Scales ────────────────────────────────────────────────────────────────
   const maxVol = d3.max(CITIES.flatMap(c => Object.values(c.vol)));
-  const rScale = d3.scaleSqrt().domain([0, maxVol]).range([0, 58]);
+  const rScale = d3.scaleSqrt().domain([0, maxVol]).range([0, 56]);
 
-  // ── SVG init ──────────────────────────────────────────────────────────────
+  // ── SVG ───────────────────────────────────────────────────────────────────
   const mapWrap = document.getElementById("map-wrap");
   const W = mapWrap.clientWidth || 1100;
   const H = Math.round(W * 0.52);
@@ -291,45 +312,44 @@
     .attr("viewBox", `0 0 ${W} ${H}`)
     .attr("preserveAspectRatio", "xMidYMid meet");
 
-  // Per-asset drop-shadow glow filters (subtle on light bg)
+  // Glow filters
   const defs = svg.append("defs");
   AC.forEach(ac => {
     const f = defs.append("filter")
       .attr("id", `glow-${ac.id}`)
       .attr("x","-60%").attr("y","-60%")
       .attr("width","220%").attr("height","220%");
-    f.append("feGaussianBlur")
-      .attr("in","SourceGraphic")
-      .attr("stdDeviation","4")
-      .attr("result","blur");
+    f.append("feGaussianBlur").attr("in","SourceGraphic").attr("stdDeviation","4").attr("result","blur");
     const fm = f.append("feMerge");
     fm.append("feMergeNode").attr("in","blur");
     fm.append("feMergeNode").attr("in","SourceGraphic");
   });
 
   // ── Projection ────────────────────────────────────────────────────────────
+  let rotAngle = 0;
   const proj = d3.geoNaturalEarth1()
     .scale(W / 6.3)
-    .translate([W / 2, H / 2]);
+    .translate([W / 2, H / 2])
+    .rotate([rotAngle, 0]);
   const geo = d3.geoPath().projection(proj);
 
-  // ── Base map ──────────────────────────────────────────────────────────────
-  svg.append("path").datum({type:"Sphere"})
-    .attr("class","sphere").attr("d",geo);
-  svg.append("path").datum(d3.geoGraticule10())
-    .attr("class","grat").attr("d",geo);
-
-  let cityLayer = null;
+  // ── Static map layers (re-rendered on rotate) ─────────────────────────────
+  const sphereEl   = svg.append("path").datum({type:"Sphere"}).attr("class","sphere").attr("d",geo);
+  const gratEl     = svg.append("path").datum(d3.geoGraticule10()).attr("class","grat").attr("d",geo);
+  let landSel, borderSel, cityLayer;
   let pendingFilter = "all";
+  let worldData = null;
 
   d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
     .then(world => {
-      svg.append("g")
+      worldData = world;
+
+      landSel = svg.append("g")
         .selectAll("path")
         .data(topojson.feature(world, world.objects.countries).features)
         .join("path").attr("class","land").attr("d",geo);
 
-      svg.append("path")
+      borderSel = svg.append("path")
         .datum(topojson.mesh(world, world.objects.countries, (a,b) => a !== b))
         .attr("class","borders").attr("d",geo);
 
@@ -337,6 +357,46 @@
       buildCities();
       applyFilter(pendingFilter, false);
     });
+
+  // ── Re-render all geo paths (called during rotation) ──────────────────────
+  function rerenderMap() {
+    sphereEl.attr("d", geo);
+    gratEl.attr("d", geo);
+    if (landSel)   landSel.attr("d", geo);
+    if (borderSel) borderSel.attr("d", geo);
+    if (cityLayer) {
+      cityLayer.selectAll(".city-group").attr("transform", d => {
+        const [x, y] = proj([d.lng, d.lat]);
+        return `translate(${x.toFixed(1)},${y.toFixed(1)})`;
+      });
+    }
+  }
+
+  // ── Rotation ──────────────────────────────────────────────────────────────
+  let rotTimer = null;
+  let isRotating = false;
+  let rotStart = 0;
+  let rotOffset = 0;
+
+  const rotateBtn = document.getElementById("rotateBtn");
+
+  rotateBtn.addEventListener("click", () => {
+    isRotating = !isRotating;
+    rotateBtn.classList.toggle("spinning", isRotating);
+
+    if (isRotating) {
+      rotStart = performance.now() - rotOffset;
+      rotTimer = d3.timer(elapsed => {
+        // 0.006 deg/ms = ~1 full rotation every ~60 seconds — very subtle drift
+        rotAngle = (elapsed * 0.006) % 360;
+        rotOffset = elapsed;
+        proj.rotate([rotAngle, 0]);
+        rerenderMap();
+      });
+    } else {
+      if (rotTimer) { rotTimer.stop(); rotTimer = null; }
+    }
+  });
 
   // ── Build city rings ──────────────────────────────────────────────────────
   function buildCities() {
@@ -348,35 +408,46 @@
         return `translate(${x.toFixed(1)},${y.toFixed(1)})`;
       });
 
-    groups.each(function(city) {
+    groups.each(function(city, cityIdx) {
       const g = d3.select(this);
-      // Largest ring first → rendered behind smaller ones
       const sorted = [...AC].sort((a,b) => city.vol[b.id] - city.vol[a.id]);
 
-      sorted.forEach(ac => {
+      sorted.forEach((ac, ringIdx) => {
         const r = rScale(city.vol[ac.id]);
         if (r < 0.8) return;
-        const sw = Math.max(2.5, r * 0.14);
+
+        // Thinner rings — stroke width is 6% of radius, min 1.5px
+        const sw = Math.max(1.5, r * 0.06);
 
         g.append("circle")
           .attr("class","city-ring")
           .attr("data-ac", ac.id)
-          .attr("r", r)
+          // Start invisible and small — animate in on load
+          .attr("r", 0)
           .attr("fill", ac.color)
-          .attr("fill-opacity", 0.08)
+          .attr("fill-opacity", 0)
           .attr("stroke", ac.color)
           .attr("stroke-width", sw)
-          .attr("stroke-opacity", 0.75);
+          .attr("stroke-opacity", 0)
+          .transition()
+            .delay(cityIdx * 60 + ringIdx * 30)
+            .duration(900)
+            .ease(d3.easeBackOut.overshoot(0.8))
+            .attr("r", r)
+            .attr("fill-opacity", 0.07)
+            .attr("stroke-opacity", 0.68);
       });
 
-      // Label offset from largest ring
       const maxR = rScale(d3.max(Object.values(city.vol)));
       g.append("text")
         .attr("class","city-label")
-        .attr("x", maxR + 6)
-        .attr("y", 0)
-        .attr("dy","0.35em")
-        .text(`${city.flag} ${city.name}`);
+        .attr("x", maxR + 6).attr("y", 0).attr("dy","0.35em")
+        .style("opacity", 0)
+        .text(`${city.flag} ${city.name}`)
+        .transition()
+          .delay(cityIdx * 60 + 500)
+          .duration(500)
+          .style("opacity", 1);
     });
 
     groups
@@ -392,20 +463,20 @@
     activeFilter = key;
     if (!cityLayer) { pendingFilter = key; return; }
 
-    const dur = animate ? 580 : 0;
+    const dur = animate ? 600 : 0;
 
     cityLayer.selectAll(".city-ring")
       .interrupt()
       .transition().duration(dur).ease(d3.easeCubicInOut)
       .attr("stroke-opacity", function() {
         const id = this.getAttribute("data-ac");
-        if (key === "all") return 0.75;
-        return id === key ? 0.92 : 0.07;
+        if (key === "all") return 0.68;
+        return id === key ? 0.90 : 0.06;
       })
       .attr("fill-opacity", function() {
         const id = this.getAttribute("data-ac");
-        if (key === "all") return 0.08;
-        return id === key ? 0.16 : 0.02;
+        if (key === "all") return 0.07;
+        return id === key ? 0.14 : 0.01;
       })
       .attr("filter", function() {
         const id = this.getAttribute("data-ac");
@@ -431,11 +502,11 @@
       const id = el.getAttribute("data-id");
       const on = key === "all" || id === key;
       el.classList.toggle("lit", on);
-      el.querySelector(".legend-swatch").style.opacity = on ? "1" : "0.18";
+      el.querySelector(".legend-swatch").style.opacity = on ? "1" : "0.15";
     });
   }
 
-  // ── Stats cards ───────────────────────────────────────────────────────────
+  // ── Stats ─────────────────────────────────────────────────────────────────
   (function buildStats() {
     document.getElementById("stats").innerHTML = STATS.map(s => `
       <div class="stat-card lit" data-id="${s.id}">
@@ -453,9 +524,7 @@
   // ── Tooltip ───────────────────────────────────────────────────────────────
   const tip = document.getElementById("tip");
 
-  function fmt(v) {
-    return v >= 1000 ? `$${(v/1000).toFixed(1)}T` : `$${v}B`;
-  }
+  function fmt(v) { return v >= 1000 ? `$${(v/1000).toFixed(1)}T` : `$${v}B`; }
 
   function showTip(evt, city) {
     tip.innerHTML = `
@@ -482,7 +551,7 @@
 
   function hideTip() { tip.classList.remove("show"); }
 
-  // ── Filter button clicks ──────────────────────────────────────────────────
+  // ── Filter buttons ─────────────────────────────────────────────────────────
   document.getElementById("filters").addEventListener("click", e => {
     const btn = e.target.closest(".filter-btn");
     if (!btn) return;
