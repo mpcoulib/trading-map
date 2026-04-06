@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where Does Trading Happen?</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #f7f6f2;
+      color: #1a1a1a;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      padding: 52px 60px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 18px;
+      color: #111;
+    }
+
+    .subtitle {
+      max-width: 560px;
+      font-size: 0.93rem;
+      color: #666;
+      line-height: 1.8;
+      margin-bottom: 6px;
+    }
+
+    .subtitle em { font-style: italic; color: #444; }
+    .subtitle .hl { color: #1d4ed8; font-weight: 500; }
+
+    /* ── Filter buttons ── */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 28px 0 18px;
+    }
+
+    .filter-btn {
+      padding: 7px 18px;
+      border-radius: 9999px;
+      border: 1.5px solid #d4d4d4;
+      background: #fff;
+      color: #666;
+      font-size: 0.83rem;
+      font-family: inherit;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+      user-select: none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .filter-btn:hover {
+      border-color: #999;
+      color: #222;
+      background: #fafafa;
+    }
+
+    .filter-btn.active {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #fff;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(29,78,216,0.3);
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: #aaa;
+      transition: color 0.35s;
+    }
+
+    .legend-item.lit { color: #333; }
+
+    .legend-swatch {
+      width: 22px;
+      height: 3.5px;
+      border-radius: 2px;
+      transition: opacity 0.35s;
+    }
+
+    /* ── Map ── */
+    #map-wrap {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #e0ddd6;
+      background: #eef2f7;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+
+    #map { width: 100%; display: block; }
+
+    /* ── SVG geo styles ── */
+    .sphere   { fill: #d6e4f0; }
+    .grat     { fill: none; stroke: #c4d8eb; stroke-width: 0.5; }
+    .land     { fill: #dcdad4; }
+    .borders  { fill: none; stroke: #c5c2bc; stroke-width: 0.5; }
+
+    .city-label {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 10.5px;
+      fill: #888;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .city-group { cursor: pointer; }
+    .city-group:hover .city-label { fill: #111; }
+
+    /* ── Tooltip ── */
+    #tip {
+      position: absolute;
+      background: rgba(255,255,255,0.98);
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 14px 16px;
+      pointer-events: none;
+      font-size: 0.8rem;
+      min-width: 200px;
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 10;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    }
+
+    #tip.show { opacity: 1; }
+
+    .tip-city {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 10px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .tip-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+    }
+
+    .tip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .tip-lbl { color: #888; flex: 1; font-size: 0.77rem; }
+    .tip-val { font-weight: 600; color: #222; font-size: 0.82rem; }
+
+    /* ── Stats ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1.5px solid #e8e6e0;
+      border-radius: 11px;
+      padding: 18px 20px;
+      transition: border-color 0.4s, background 0.4s, box-shadow 0.4s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .stat-card.lit {
+      border-color: #1d4ed8;
+      background: #eff4ff;
+      box-shadow: 0 2px 12px rgba(29,78,216,0.12);
+    }
+
+    .stat-val {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      margin-bottom: 8px;
+      color: #111;
+    }
+
+    .stat-lbl {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #999;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Where does trading happen?</h1>
+
+  <p class="subtitle">
+    Before we look at <em>when</em> markets are liquid, it helps to understand
+    <em>where</em> they are and <em>how big</em> they are. Financial markets are
+    spread across the globe — and they vary enormously in scale.
+  </p>
+  <p class="subtitle" style="margin-top:7px">
+    Each set of rings represents a major financial center.
+    Size shows <span class="hl">daily trading volume</span>.
+    Pick an asset class to see where it's traded — and how the map changes dramatically.
+  </p>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="fx">Foreign Exchange</button>
+    <button class="filter-btn" data-filter="eq">Equities</button>
+    <button class="filter-btn" data-filter="bd">Bonds</button>
+    <button class="filter-btn" data-filter="cm">Commodities</button>
+    <button class="filter-btn" data-filter="cr">Crypto</button>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div id="map-wrap">
+    <svg id="map"></svg>
+    <div id="tip"></div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script>
+  // ── Data ──────────────────────────────────────────────────────────────────
+  const CITIES = [
+    { name:"London",    flag:"🇬🇧", lat: 51.507, lng:  -0.128, vol:{fx:3576,eq:320, bd:490,cm:55, cr:6 } },
+    { name:"New York",  flag:"🇺🇸", lat: 40.713, lng: -74.006, vol:{fx:1264,eq:500, bd:900,cm:110,cr:12} },
+    { name:"Singapore", flag:"🇸🇬", lat:  1.352, lng: 103.820, vol:{fx:633, eq:60,  bd:90, cm:45, cr:7 } },
+    { name:"Tokyo",     flag:"🇯🇵", lat: 35.690, lng: 139.692, vol:{fx:436, eq:180, bd:160,cm:25, cr:4 } },
+    { name:"Hong Kong", flag:"🇭🇰", lat: 22.396, lng: 114.109, vol:{fx:314, eq:280, bd:55, cm:35, cr:9 } },
+    { name:"Shanghai",  flag:"🇨🇳", lat: 31.230, lng: 121.474, vol:{fx:95,  eq:450, bd:220,cm:75, cr:3 } },
+    { name:"Frankfurt", flag:"🇩🇪", lat: 50.111, lng:   8.682, vol:{fx:180, eq:160, bd:105,cm:22, cr:3 } },
+    { name:"Chicago",   flag:"🇺🇸", lat: 41.878, lng: -87.630, vol:{fx:95,  eq:210, bd:310,cm:220,cr:6 } },
+    { name:"Zurich",    flag:"🇨🇭", lat: 47.377, lng:   8.542, vol:{fx:150, eq:85,  bd:65, cm:35, cr:4 } },
+    { name:"Sydney",    flag:"🇦🇺", lat:-33.869, lng: 151.209, vol:{fx:182, eq:75,  bd:45, cm:32, cr:3 } },
+    { name:"Dubai",     flag:"🇦🇪", lat: 25.205, lng:  55.271, vol:{fx:60,  eq:30,  bd:25, cm:80, cr:5 } },
+  ];
+
+  // High-contrast palette — readable on projectors in bright rooms
+  const AC = [
+    { id:"fx", label:"Foreign Exchange", color:"#1d4ed8" },  // deep blue
+    { id:"eq", label:"Equities",         color:"#15803d" },  // forest green
+    { id:"bd", label:"Bonds",            color:"#7e22ce" },  // deep violet
+    { id:"cm", label:"Commodities",      color:"#b45309" },  // warm amber
+    { id:"cr", label:"Crypto",           color:"#0e7490" },  // teal
+  ];
+
+  const STATS = [
+    { val:"$7.5T", lbl:"FX Daily Volume",   id:"fx" },
+    { val:"$900B", lbl:"US Bonds Daily",    id:"bd" },
+    { val:"$500B", lbl:"US Equities Daily", id:"eq" },
+    { val:"$130B", lbl:"Gold Daily",        id:"cm" },
+    { val:"$30B",  lbl:"Bitcoin Daily",     id:"cr" },
+  ];
+
+  // ── Scales ────────────────────────────────────────────────────────────────
+  const maxVol = d3.max(CITIES.flatMap(c => Object.values(c.vol)));
+  const rScale = d3.scaleSqrt().domain([0, maxVol]).range([0, 58]);
+
+  // ── SVG init ──────────────────────────────────────────────────────────────
+  const mapWrap = document.getElementById("map-wrap");
+  const W = mapWrap.clientWidth || 1100;
+  const H = Math.round(W * 0.52);
+
+  const svg = d3.select("#map")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
+
+  // Per-asset drop-shadow glow filters (subtle on light bg)
+  const defs = svg.append("defs");
+  AC.forEach(ac => {
+    const f = defs.append("filter")
+      .attr("id", `glow-${ac.id}`)
+      .attr("x","-60%").attr("y","-60%")
+      .attr("width","220%").attr("height","220%");
+    f.append("feGaussianBlur")
+      .attr("in","SourceGraphic")
+      .attr("stdDeviation","4")
+      .attr("result","blur");
+    const fm = f.append("feMerge");
+    fm.append("feMergeNode").attr("in","blur");
+    fm.append("feMergeNode").attr("in","SourceGraphic");
+  });
+
+  // ── Projection ────────────────────────────────────────────────────────────
+  const proj = d3.geoNaturalEarth1()
+    .scale(W / 6.3)
+    .translate([W / 2, H / 2]);
+  const geo = d3.geoPath().projection(proj);
+
+  // ── Base map ──────────────────────────────────────────────────────────────
+  svg.append("path").datum({type:"Sphere"})
+    .attr("class","sphere").attr("d",geo);
+  svg.append("path").datum(d3.geoGraticule10())
+    .attr("class","grat").attr("d",geo);
+
+  let cityLayer = null;
+  let pendingFilter = "all";
+
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
+    .then(world => {
+      svg.append("g")
+        .selectAll("path")
+        .data(topojson.feature(world, world.objects.countries).features)
+        .join("path").attr("class","land").attr("d",geo);
+
+      svg.append("path")
+        .datum(topojson.mesh(world, world.objects.countries, (a,b) => a !== b))
+        .attr("class","borders").attr("d",geo);
+
+      cityLayer = svg.append("g").attr("class","cities");
+      buildCities();
+      applyFilter(pendingFilter, false);
+    });
+
+  // ── Build city rings ──────────────────────────────────────────────────────
+  function buildCities() {
+    const groups = cityLayer.selectAll(".city-group")
+      .data(CITIES).join("g")
+      .attr("class","city-group")
+      .attr("transform", d => {
+        const [x,y] = proj([d.lng, d.lat]);
+        return `translate(${x.toFixed(1)},${y.toFixed(1)})`;
+      });
+
+    groups.each(function(city) {
+      const g = d3.select(this);
+      // Largest ring first → rendered behind smaller ones
+      const sorted = [...AC].sort((a,b) => city.vol[b.id] - city.vol[a.id]);
+
+      sorted.forEach(ac => {
+        const r = rScale(city.vol[ac.id]);
+        if (r < 0.8) return;
+        const sw = Math.max(2.5, r * 0.14);
+
+        g.append("circle")
+          .attr("class","city-ring")
+          .attr("data-ac", ac.id)
+          .attr("r", r)
+          .attr("fill", ac.color)
+          .attr("fill-opacity", 0.08)
+          .attr("stroke", ac.color)
+          .attr("stroke-width", sw)
+          .attr("stroke-opacity", 0.75);
+      });
+
+      // Label offset from largest ring
+      const maxR = rScale(d3.max(Object.values(city.vol)));
+      g.append("text")
+        .attr("class","city-label")
+        .attr("x", maxR + 6)
+        .attr("y", 0)
+        .attr("dy","0.35em")
+        .text(`${city.flag} ${city.name}`);
+    });
+
+    groups
+      .on("mouseover", (e,d) => showTip(e,d))
+      .on("mousemove",       moveTip)
+      .on("mouseleave",      hideTip);
+  }
+
+  // ── Filter ────────────────────────────────────────────────────────────────
+  let activeFilter = "all";
+
+  function applyFilter(key, animate = true) {
+    activeFilter = key;
+    if (!cityLayer) { pendingFilter = key; return; }
+
+    const dur = animate ? 580 : 0;
+
+    cityLayer.selectAll(".city-ring")
+      .interrupt()
+      .transition().duration(dur).ease(d3.easeCubicInOut)
+      .attr("stroke-opacity", function() {
+        const id = this.getAttribute("data-ac");
+        if (key === "all") return 0.75;
+        return id === key ? 0.92 : 0.07;
+      })
+      .attr("fill-opacity", function() {
+        const id = this.getAttribute("data-ac");
+        if (key === "all") return 0.08;
+        return id === key ? 0.16 : 0.02;
+      })
+      .attr("filter", function() {
+        const id = this.getAttribute("data-ac");
+        if (key === "all" || id !== key) return null;
+        return `url(#glow-${id})`;
+      });
+
+    refreshLegend(key);
+    refreshStats(key);
+  }
+
+  // ── Legend ────────────────────────────────────────────────────────────────
+  (function buildLegend() {
+    document.getElementById("legend").innerHTML = AC.map(ac => `
+      <div class="legend-item lit" data-id="${ac.id}">
+        <div class="legend-swatch" style="background:${ac.color}"></div>
+        <span>${ac.label}</span>
+      </div>`).join("");
+  })();
+
+  function refreshLegend(key) {
+    document.querySelectorAll(".legend-item").forEach(el => {
+      const id = el.getAttribute("data-id");
+      const on = key === "all" || id === key;
+      el.classList.toggle("lit", on);
+      el.querySelector(".legend-swatch").style.opacity = on ? "1" : "0.18";
+    });
+  }
+
+  // ── Stats cards ───────────────────────────────────────────────────────────
+  (function buildStats() {
+    document.getElementById("stats").innerHTML = STATS.map(s => `
+      <div class="stat-card lit" data-id="${s.id}">
+        <div class="stat-val">${s.val}</div>
+        <div class="stat-lbl">${s.lbl}</div>
+      </div>`).join("");
+  })();
+
+  function refreshStats(key) {
+    document.querySelectorAll(".stat-card").forEach(el => {
+      el.classList.toggle("lit", key === "all" || el.getAttribute("data-id") === key);
+    });
+  }
+
+  // ── Tooltip ───────────────────────────────────────────────────────────────
+  const tip = document.getElementById("tip");
+
+  function fmt(v) {
+    return v >= 1000 ? `$${(v/1000).toFixed(1)}T` : `$${v}B`;
+  }
+
+  function showTip(evt, city) {
+    tip.innerHTML = `
+      <div class="tip-city">${city.flag} ${city.name}</div>
+      ${AC.map(ac => `
+        <div class="tip-row">
+          <div class="tip-dot" style="background:${ac.color}"></div>
+          <span class="tip-lbl">${ac.label}</span>
+          <span class="tip-val">${fmt(city.vol[ac.id])}</span>
+        </div>`).join("")}`;
+    tip.classList.add("show");
+    moveTip(evt);
+  }
+
+  function moveTip(evt) {
+    const box = mapWrap.getBoundingClientRect();
+    let x = evt.clientX - box.left + 14;
+    let y = evt.clientY - box.top - 12;
+    if (x + 220 > box.width)  x -= 235;
+    if (y + 220 > box.height) y -= 215;
+    tip.style.left = x + "px";
+    tip.style.top  = y + "px";
+  }
+
+  function hideTip() { tip.classList.remove("show"); }
+
+  // ── Filter button clicks ──────────────────────────────────────────────────
+  document.getElementById("filters").addEventListener("click", e => {
+    const btn = e.target.closest(".filter-btn");
+    if (!btn) return;
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    applyFilter(btn.dataset.filter);
+  });
+  </script>
+</body>
+</html>
