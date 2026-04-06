@@ -416,8 +416,7 @@
         const r = rScale(city.vol[ac.id]);
         if (r < 0.8) return;
 
-        // Thinner rings — stroke width is 6% of radius, min 1.5px
-        const sw = Math.max(1.5, r * 0.06);
+        const sw = Math.max(1.5, r * 0.08);
 
         g.append("circle")
           .attr("class","city-ring")
@@ -434,8 +433,8 @@
             .duration(900)
             .ease(d3.easeBackOut.overshoot(0.8))
             .attr("r", r)
-            .attr("fill-opacity", 0.07)
-            .attr("stroke-opacity", 0.68);
+            .attr("fill-opacity", 0.45)
+            .attr("stroke-opacity", 0.85);
       });
 
       const maxR = rScale(d3.max(Object.values(city.vol)));
@@ -470,13 +469,13 @@
       .transition().duration(dur).ease(d3.easeCubicInOut)
       .attr("stroke-opacity", function() {
         const id = this.getAttribute("data-ac");
-        if (key === "all") return 0.68;
-        return id === key ? 0.90 : 0.06;
+        if (key === "all") return 0.85;
+        return id === key ? 0.95 : 0.08;
       })
       .attr("fill-opacity", function() {
         const id = this.getAttribute("data-ac");
-        if (key === "all") return 0.07;
-        return id === key ? 0.14 : 0.01;
+        if (key === "all") return 0.45;
+        return id === key ? 0.60 : 0.04;
       })
       .attr("filter", function() {
         const id = this.getAttribute("data-ac");
